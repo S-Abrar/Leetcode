@@ -1,30 +1,22 @@
 class Solution {
 public:
-    long long maxSumTrionic(vector<int>& nums) {
-        int n = nums.size();
-        long long res = -2e18;
-        for (int i = 1; i < n - 2; ) {
-            int a = i, b = i;
-            long long net = nums[a];
-            while (b + 1 < n && nums[b + 1] < nums[b]) {
-                net += nums[++b];
+    long long maxSumTrionic(const vector<int>& nums) {
+        const long long INF = -1e17;
+        long long result = INF, a = INF, b = INF, c = INF;
+        long long prev = nums[0];
+        for (size_t i = 1; i < nums.size(); i++) {
+            long long curr = nums[i];
+            auto na = INF, nb = INF, nc = INF;
+            if (curr > prev) { // increasing, update first and third state
+                na = max(a, prev) + curr;
+                nc = max(b, c) + curr;
+            } else if (curr < prev) { // decreasing, update second state
+                nb = max(a, b) + curr;
             }
-            if (b == a) { i++; continue; }
-            int c = b;
-            long long left = 0, right = 0, lx = -2e18, rx = -2e18;
-            while (a - 1 >= 0 && nums[a - 1] < nums[a]) {
-                left += nums[--a];
-                lx = max(lx, left);
-            }
-            if (a == i) { i++; continue; }
-            while (b + 1 < n && nums[b + 1] > nums[b]) {
-                right += nums[++b];
-                rx = max(rx, right);
-            }
-            if (b == c) { i++; continue; }
-            res = max(res, lx + rx + net);
-            i = b;
+            a = na, b = nb, c = nc;
+            result = max(result, c);
+            prev = curr;
         }
-        return res;
+        return result;
     }
 };
