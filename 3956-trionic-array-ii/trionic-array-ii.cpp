@@ -1,56 +1,30 @@
-
 class Solution {
 public:
-    vector<tuple<int, int, long long> > decompose(vector<int>& nums){
-        int n = (int)nums.size();
-        vector<tuple<int, int, long long> > subarrays;
-
-        int l = 0;
-        long long sum = nums[0];
-        
-        for(int i = 1; i < n; i ++){
-            // If we fail strict decreasing at boundary i-1 -> i, end the current subarray.
-            if(nums[i - 1] <= nums[i]){
-                subarrays.push_back({l, i - 1, sum});
-                l = i;
-                sum = 0;
+    long long maxSumTrionic(vector<int>& nums) {
+        int n = nums.size();
+        long long res = -2e18;
+        for (int i = 1; i < n - 2; ) {
+            int a = i, b = i;
+            long long net = nums[a];
+            while (b + 1 < n && nums[b + 1] < nums[b]) {
+                net += nums[++b];
             }
-            sum += nums[i];
-        }
-        //last subarray
-        subarrays.push_back({l, n - 1, sum});
-        return subarrays;
-    }
-    long long maxSumTrionic(vector<int>& nums){
-        int n = (int)nums.size();
-        long long maxEndingAt[n];
-        for(int i = 0; i < n; i ++){
-            maxEndingAt[i] = nums[i];
-            if(i > 0 && nums[i - 1] < nums[i]){
-                if(maxEndingAt[i - 1] > 0){
-                    maxEndingAt[i] += maxEndingAt[i - 1];
-                }
+            if (b == a) { i++; continue; }
+            int c = b;
+            long long left = 0, right = 0, lx = -2e18, rx = -2e18;
+            while (a - 1 >= 0 && nums[a - 1] < nums[a]) {
+                left += nums[--a];
+                lx = max(lx, left);
             }
-        }
-        long long maxStartingAt[n];
-        for(int i = n - 1; i >= 0; i --){
-            maxStartingAt[i] = nums[i];
-            if(i < n - 1 && nums[i] < nums[i + 1]){
-                if(maxStartingAt[i + 1] > 0){
-                    maxStartingAt[i] += maxStartingAt[i + 1];
-                }
+            if (a == i) { i++; continue; }
+            while (b + 1 < n && nums[b + 1] > nums[b]) {
+                right += nums[++b];
+                rx = max(rx, right);
             }
+            if (b == c) { i++; continue; }
+            res = max(res, lx + rx + net);
+            i = b;
         }
-        vector<tuple<int, int, long long> > PQS = decompose(nums);
-        long long ans = LLONG_MIN;
-        for(auto [p, q, sum] : PQS){
-            
-            if(p > 0 && nums[p-1] < nums[p] &&
-               q < n - 1 && nums[q] < nums[q + 1] &&
-               p < q){
-                ans = max(ans, maxEndingAt[p-1] + sum + maxStartingAt[q+1]);
-            }
-        }
-        return ans;
+        return res;
     }
 };
