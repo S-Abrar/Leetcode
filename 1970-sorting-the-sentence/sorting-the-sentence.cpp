@@ -1,28 +1,39 @@
-#include <vector>
-#include <string>
-#include <sstream>
-using namespace std;
-
 class Solution {
 public:
     string sortSentence(string s) {
-        vector<string> words(10); // max 9 words
-        string word;
-        stringstream ss(s);
+        vector<string> ans(10);
+        string temp;
+        int count = 0, index = 0;
 
-        while (ss >> word) {
-            int pos = word.back() - '0';  // position
-            word.pop_back();              // remove number
-            words[pos] = word;
+        while (index < s.size()) {
+            if (s[index] == ' ') {
+                int pos = temp[temp.size() - 1] - '0';
+                temp.pop_back();
+                ans[pos] = temp;
+                temp.clear();
+                count++;
+                index++;
+            } else {
+                temp += s[index];
+                index++;
+            }
         }
 
-        string result;
-        for (int i = 1; i < 10; i++) {
-            if (words[i].empty()) break;
-            if (!result.empty()) result += " ";
-            result += words[i];
+        // handle last word (no space after it)
+        if (!temp.empty()) {
+            int pos = temp.back() - '0';
+            temp.pop_back();
+            ans[pos] = temp;
+            count++;
         }
 
-        return result;
+        temp.clear();
+        for (int i = 1; i <= count; i++) {
+            temp += ans[i];
+            temp += " ";
+        }
+
+        temp.pop_back(); // remove extra space
+        return temp;
     }
 };
